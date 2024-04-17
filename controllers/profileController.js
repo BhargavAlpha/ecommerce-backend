@@ -1,8 +1,8 @@
 const User =require('../models/user');
 exports.profile= async (req,res)=>{
-    const { email } = req.body;
-
+    const { email } = req.params;
   try {
+    console.log(email);
     const user = await User.findOne({ email });
 
     if (!user) {

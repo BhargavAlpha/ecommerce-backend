@@ -26,14 +26,12 @@ exports.getProductById=async(req,res)=>{
 exports.createProduct=async(req,res)=>{
     const axios = require('axios');
     try {
-        // Fetch data from the external API (replace 'apiEndpoint' with the actual API endpoint)
         const apiEndpoint = 'https://fakestoreapi.com/products/';
         const response = await axios.get(apiEndpoint);
     
-        // Extract relevant data from the API response (adjust based on the API structure)
+        
         const apiData = response.data;
     
-        // Save each API data item to the MongoDB database
         for (const item of apiData) {
           const newData = new Product({
             id:item.id,
@@ -41,7 +39,7 @@ exports.createProduct=async(req,res)=>{
             productDescription: item.description,
             price: item.price,
             image:item.image,
-            // Map more fields as needed...
+            
           });
     
           await newData.save();
@@ -52,6 +50,29 @@ exports.createProduct=async(req,res)=>{
         console.error('Error fetching and storing API data:', error);
         res.status(500).json({ error: 'Failed to fetch and store API data' });
       }
+}
+
+exports.modifyProduct=async(req,res)=>{
+  const productId = req.params.id;
+  const updatedFields = req.body;
+  try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      throw new Error('Product not found');
+    }
+
+    Object.keys(updatedFields).forEach((field) => {
+      if (product[field] !== updatedFields[field]) {
+        product[field] = updatedFields[field];
+      }
+    });
+
+    const updatedProduct = await product.save();
+    return updatedProduct;
+  } catch (error) {
+    console.error('Error updating product:', error);
+    throw error;
+  }
 }
     
     
