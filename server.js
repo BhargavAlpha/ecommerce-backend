@@ -2,6 +2,7 @@ require('./config/dotenv')
 const express = require('express');
 const router = express.Router();
 const app = express();
+const path = require("path");
 const multer=require('multer')
 const cors = require('cors');
 const authRoutes = require('./routes/authRoute');
@@ -12,45 +13,22 @@ const { Requests } = require('./models/requests');
 app.use(cors()); 
 
 app.use(express.json());
-
-// Connect to MongoDB
-// Connect to MongoDB
+app.use("/images", express.static(path.join(__dirname, "/images")));
+app.use(express.urlencoded({ extended: true }));
 connectToDatabase();
-const storage=multer.diskStorage({
-    destination:function(req,file,cb){
-        cb(null,'images');
-    },filename: function (req, file, cb) {
-        cb(null, file.originalname); 
-      }
-  })
- 
-  const upload = multer({ storage: storage });
-//   app.use(multer({ storage: storage }))
-  router.post('/api/submit-request', upload.single('image'), async (req, res) => {
-    console.log("Request received");
-    try {
-      const { productName, price, productDescription, email,productId } = req.body;
-      const image = req.file ? req.file.path : null; // Get the path of the uploaded image file
-  
-      // Create a new Product document
-      const newRequest = new Requests({
-        productName,
-        price,
-        productDescription,
-        image,
-        email,
-        productId
-      });
-  
-      // Save the product to the database
-      await newRequest.save();
-  
-      res.status(201).json({ message: 'Product request submitted successfully' });
-    } catch (error) {
-      console.error('Error submitting product request:', error);
-      res.status(500).json({ error: 'Failed to submit product request' });
-    }
-  });
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+      cb(null, "images");
+  },
+  filename: (req, file, cb) => {
+      cb(null, req.body.img);
+  }
+});
+
+const upload = multer({ storage: storage });
+app.post("/upload", upload.single("file"), (req, res) => {
+  res.status(200).json("Image uploaded successfully!");
+});
 
   app.use('/', router); 
 

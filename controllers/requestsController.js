@@ -39,6 +39,17 @@ exports.getRequestById=async(req,res)=>{
         res.status(500).json({error:error.message});
 }
 }
+exports.submitRequest=async(req,res)=>{
+    try{
+        const {email,productName,price,productDescription,image,productId}=req.body;
+        const request=new Requests({email,productName,price,productDescription,image,productId});
+        await request.save();
+        res.status(201).json(request);
+    }
+    catch(error){
+        res.status(500).json({error:error.message});
+    }
+}
 
 exports.modifyRequest=async(req,res)=>{
     const { id } = req.params;

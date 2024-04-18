@@ -56,23 +56,22 @@ exports.modifyProduct=async(req,res)=>{
   const productId = req.params.id;
   const updatedFields = req.body;
   try {
-    const product = await Product.findById(productId);
-    if (!product) {
-      throw new Error('Product not found');
+    const updatedProduct = await Product.findOneAndUpdate(
+        { id: productId }, 
+        updatedFields,
+        { new: true } 
+    );
+
+    if (!updatedProduct) {
+        return res.status(404).json({ error: 'Product not found' });
     }
 
-    Object.keys(updatedFields).forEach((field) => {
-      if (product[field] !== updatedFields[field]) {
-        product[field] = updatedFields[field];
-      }
-    });
-
-    const updatedProduct = await product.save();
-    return updatedProduct;
-  } catch (error) {
-    console.error('Error updating product:', error);
-    throw error;
-  }
+    res.status(200).json(updatedProduct);
+} catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
 }
+};
+
     
     
