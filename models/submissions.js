@@ -5,5 +5,4 @@ const submissions=new mongoose.Schema({
     ProductId:{type:Number,required:true},
     productName:{type:String},
     status:{type:String,default:'pending'},
-
 })

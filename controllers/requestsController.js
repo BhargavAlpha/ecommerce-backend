@@ -47,6 +47,7 @@ exports.submitRequest=async(req,res)=>{
         res.status(201).json(request);
     }
     catch(error){
+        console.log(error.message);
         res.status(500).json({error:error.message});
     }
 }
